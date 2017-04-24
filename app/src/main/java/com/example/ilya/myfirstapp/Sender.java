@@ -5,16 +5,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 
 
 public class Sender extends Thread{
     private byte[] buffer;
     private int size;
+    static Semaphore mutex;
 
 
     public Sender(String message){
         buffer=message.getBytes();
         size=message.length();
+        mutex = new Semaphore(0);
     }
 
     public void run(){
