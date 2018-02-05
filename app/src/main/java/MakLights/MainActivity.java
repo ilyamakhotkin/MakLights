@@ -10,9 +10,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private Communicator communicator;
+    static public TextView debugView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         bar.setProgress(LEDController.getBlue());
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Ilya Is Awsome");
+        debugView = findViewById(R.id.DEBUG);
+        debugView.append("MainActivity onCreate\r\n");
 
         communicator = new Communicator();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -51,12 +55,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         System.out.println("Pausing main activity");
+        debugView.append("MainActivity onPause\r\n");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         System.out.println("Resuming main activity");
+        debugView.append("MainActivity onResume\r\n");
     }
 
     @Override
@@ -77,13 +83,11 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Intent i2 = new Intent(this,SettingsActivity.class);
             startActivity(i2);
-            return true;
         }
 
         if (id == R.id.action_alarm) {
             Intent i2 = new Intent(this,Alarm.class);
             startActivity(i2);
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -1,18 +1,19 @@
 package MakLights;
 
 import java.io.IOException;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.Semaphore;
 
 public class Communicator extends Thread{
     private Socket socket;
-    private InputStream inputStream;
+//    private InputStream inputStream;
     private OutputStream outputStream;
     private Sender sender;
-    private Receiver receiver;
+//    private Receiver receiver;
     private String strIP;
     private int intPort;
     private String strUser;
@@ -66,12 +67,12 @@ public class Communicator extends Thread{
                     sender.safeStop();
                     sender.join(100);
                 }
-                if (receiver != null) {
-                    receiver.safeStop();
-                    receiver.join(100);
-                }
-                if (inputStream != null)
-                    inputStream.close();
+//                if (receiver != null) {
+//                    receiver.safeStop();
+//                    receiver.join(100);
+//                }
+//                if (inputStream != null)
+//                    inputStream.close();
                 if (outputStream != null)
                     outputStream.close();
                 if (socket != null && socket.isConnected())
@@ -79,10 +80,19 @@ public class Communicator extends Thread{
 
                 socket = new Socket();
                 InetSocketAddress address = new InetSocketAddress(strIP, intPort);
-                socket.connect(address, 10);
+                while (!socket.isConnected()) {
+                    try {
+                        socket.connect(address, 1000);
+                    } catch (SocketTimeoutException | java.net.ConnectException e) {
+                        MainActivity.debugView.append("Socket connection failed. Retrying\r\n");
+                        sleep(5000);
+                        socket = new Socket();
+                    }
+                }
                 if (socket.isConnected()) {
+                    MainActivity.debugView.append("Socket connected\r\n");
                     outputStream = socket.getOutputStream();
-                    inputStream = socket.getInputStream();
+//                    inputStream = socket.getInputStream();
 
 //                receiver = new Receiver(inputStream);
 //                receiver.start();

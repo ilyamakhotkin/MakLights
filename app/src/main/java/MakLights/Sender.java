@@ -45,20 +45,23 @@ public class Sender extends Thread{
     }
 
     public void run() {
-        while (run) {
-            try{
-                semaphore.acquire();
+        try{
+            semaphore.acquire();
+            while (run) {
                 listAccess.acquire();
                 String message = messages.remove();
                 listAccess.release();
                 System.out.printf("Sending %d bytes: %s\r\n", message.length(), message);
+                MainActivity.debugView.append(message);
                 outputStream.write(message.getBytes(), 0, message.length());
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                semaphore.acquire();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        System.out.println("Sender is exiting");
     }
 }
