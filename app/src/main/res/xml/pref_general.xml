@@ -1,0 +1,42 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:title="User Name"
+        android:key="user_name"
+        android:capitalize="words"
+        android:defaultValue="@string/pref_default_display_name"
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"/>
+
+    <EditTextPreference
+        android:title="Password"
+        android:key="password"
+        android:defaultValue="@string/pref_default_password"
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:visibility="visible" />
+
+    <EditTextPreference
+        android:title="Server IP"
+        android:key="ip"
+        android:defaultValue="@string/pref_default_ip"
+        android:inputType="number"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"/>
+
+    <EditTextPreference
+        android:title="Port Number"
+        android:defaultValue="4592"
+        android:key="port"
+        android:inputType="number"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"/>
+
+</PreferenceScreen>
