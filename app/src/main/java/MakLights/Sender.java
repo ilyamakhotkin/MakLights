@@ -9,6 +9,7 @@ import java.util.concurrent.Semaphore;
 public class Sender extends Thread{
 
     private Semaphore semaphore;
+    private Semaphore listAccess;
     private OutputStream outputStream;
     private Queue<String> messages;
     private boolean run;
@@ -16,6 +17,8 @@ public class Sender extends Thread{
 
     Sender(String strIdentity_, OutputStream outputStream_){
         semaphore = new Semaphore(0);
+        listAccess = new Semaphore(0);
+        listAccess.release();
         strIdentity = strIdentity_;
         outputStream = outputStream_;
         messages = new LinkedList();
@@ -25,9 +28,15 @@ public class Sender extends Thread{
 
     void send(String command){
         String message = strIdentity.concat(command);
-//        message = message.concat("\r\n");
-        if(messages.add(message))
-            semaphore.release();
+        message = message.concat("\r\n");
+        try {
+            listAccess.acquire();
+            if(messages.add(message))
+                semaphore.release();
+            listAccess.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     void safeStop(){
@@ -39,12 +48,11 @@ public class Sender extends Thread{
         while (run) {
             try{
                 semaphore.acquire();
-                if (!messages.isEmpty()) {
-                    String message = messages.remove();
-                    System.out.printf("Sending %d bytes: %s\r\n", message.length(), message);
-                    outputStream.write(message.getBytes(), 0, message.length());
-                    outputStream.write("\r\n".getBytes(), 0, 2);
-                }
+                listAccess.acquire();
+                String message = messages.remove();
+                listAccess.release();
+                System.out.printf("Sending %d bytes: %s\r\n", message.length(), message);
+                outputStream.write(message.getBytes(), 0, message.length());
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
